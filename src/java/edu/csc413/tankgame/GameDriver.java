@@ -4,6 +4,7 @@ import edu.csc413.tankgame.model.*;
 import edu.csc413.tankgame.view.*;
 
 import java.awt.event.ActionEvent;
+import java.util.List;
 
 public class GameDriver {
     private final MainView mainView;
@@ -52,6 +53,41 @@ public class GameDriver {
      */
     private void setUpGame() {
         // TODO: Implement.
+        Tank playerTank = new Tank(
+                Constants.PLAYER_TANK_ID,
+                Constants.PLAYER_TANK_INITIAL_X,
+                Constants.PLAYER_TANK_INITIAL_Y,
+                Constants.PLAYER_TANK_INITIAL_ANGLE);
+
+        Tank aiTank = new Tank(
+                Constants.AI_TANK_1_ID,
+                Constants.AI_TANK_1_INITIAL_X,
+                Constants.AI_TANK_1_INITIAL_Y,
+                Constants.AI_TANK_1_INITIAL_ANGLE);
+
+        List<WallInformation> wallInfos = WallInformation.readWalls();
+        int id = 0;
+        for (WallInformation wallInfo : wallInfos) {
+            //Create a Wall Entity, add it to game world
+            runGameView.addSprite("wall-" + id++, wallInfo.getImageFile(), wallInfo.getX(), wallInfo.getY(), 0.0);
+        }
+
+        gameWorld.addEntity(playerTank);
+        gameWorld.addEntity(aiTank);
+        gameWorld.moveEntitiesToAdd();
+
+        runGameView.addSprite(
+                playerTank.getId(),
+                RunGameView.PLAYER_TANK_IMAGE_FILE,
+                playerTank.getX(),
+                playerTank.getY(),
+                playerTank.getAngle());
+        runGameView.addSprite(
+                aiTank.getId(),
+                RunGameView.AI_TANK_IMAGE_FILE,
+                aiTank.getX(),
+                aiTank.getY(),
+                aiTank.getAngle());
     }
 
     /**
@@ -61,6 +97,24 @@ public class GameDriver {
      */
     private boolean updateGame() {
         // TODO: Implement.
+        //move each entity
+        for (Entity entity : gameWorld.getEntities()) {
+            entity.move(gameWorld);
+            entity.checkBounds(gameWorld);
+        }
+
+        for (Entity entity : gameWorld.getEntitiesToAdd()) {
+            runGameView.addSprite(entity.getId(), RunGameView.SHELL_IMAGE_FILE, entity.getX(), entity.getY(), entity.getAngle());
+        }
+
+        gameWorld.moveEntitiesToAdd();
+
+        // doing some other stuff such as collision detection, bounds checking...
+
+        //draw or update entities with new location
+        for (Entity entity : gameWorld.getEntities()) {
+            runGameView.setSpriteLocationAndAngle(entity.getId(), entity.getX(), entity.getY(), entity.getAngle());
+        }
         return true;
     }
 

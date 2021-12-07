@@ -9,20 +9,34 @@ import java.util.*;
 public class GameWorld {
     // TODO: Implement. There's a lot of information the GameState will need to store to provide contextual information.
     //       Add whatever instance variables, constructors, and methods are needed.
+    private ArrayList<Entity> entities;
+    private ArrayList<Entity> entitiesToAdd;
 
     public GameWorld() {
         // TODO: Implement.
+        entities = new ArrayList<>();
+        entitiesToAdd = new ArrayList<>();
     }
 
     /** Returns a list of all entities in the game. */
     public List<Entity> getEntities() {
         // TODO: Implement.
-        return null;
+        return entities;
+    }
+
+    public List<Entity> getEntitiesToAdd() {
+        return entitiesToAdd;
     }
 
     /** Adds a new entity to the game. */
     public void addEntity(Entity entity) {
         // TODO: Implement.
+        entitiesToAdd.add(entity);
+    }
+
+    public void moveEntitiesToAdd() {
+        entities.addAll(entitiesToAdd);
+        entitiesToAdd.clear();
     }
 
     /** Returns the Entity with the specified ID. */
