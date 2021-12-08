@@ -4,7 +4,7 @@ public class Constants {
     public static final double TANK_WIDTH = 55.0;
     public static final double TANK_HEIGHT = 47.0;
     public static final double TANK_MOVEMENT_SPEED = 2.0;
-    public static final double TANK_TURN_SPEED = Math.toRadians(3.0);
+    public static final double TANK_TURN_SPEED = Math.toRadians(2.0);
 
     public static final double SHELL_WIDTH = 12.0;
     public static final double SHELL_HEIGHT = 8.0;

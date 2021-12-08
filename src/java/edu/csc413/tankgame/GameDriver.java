@@ -53,13 +53,13 @@ public class GameDriver {
      */
     private void setUpGame() {
         // TODO: Implement.
-        Tank playerTank = new Tank(
+        Tank playerTank = new PlayerTank(
                 Constants.PLAYER_TANK_ID,
                 Constants.PLAYER_TANK_INITIAL_X,
                 Constants.PLAYER_TANK_INITIAL_Y,
                 Constants.PLAYER_TANK_INITIAL_ANGLE);
 
-        Tank aiTank = new Tank(
+        Tank aiTank = new AiTank(
                 Constants.AI_TANK_1_ID,
                 Constants.AI_TANK_1_INITIAL_X,
                 Constants.AI_TANK_1_INITIAL_Y,
