@@ -100,24 +100,24 @@ public class GameDriver {
      * (e.g. the player tank being destroyed, escape being pressed), it should return false.
      */
     private boolean updateGame() {
-        // TODO: Implement.
-        //move each entity
-        for (Entity entity : gameWorld.getEntities()) {
-            entity.move(gameWorld);
-            entity.checkBounds(gameWorld);
+        //move the entities then check bounds
+        List<Entity> currentEntities = gameWorld.getEntities();
+        for (int i = 0; i < currentEntities.size(); i++) {
+            currentEntities.get(i).move(gameWorld);
+            currentEntities.get(i).checkBounds(gameWorld);
         }
 
+        //remove the sprite on the screen
         for (Entity entity : gameWorld.getEntitiesToRemove()) {
             runGameView.removeSprite(entity.getId());
         }
+        gameWorld.getEntitiesToRemove().clear();
 
+        //add sprite to the screen
         for (Entity entity : gameWorld.getEntitiesToAdd()) {
             runGameView.addSprite(entity.getId(), RunGameView.SHELL_IMAGE_FILE, entity.getX(), entity.getY(), entity.getAngle());
         }
-
         gameWorld.moveEntitiesToAdd();
-
-        // doing some other stuff such as collision detection, bounds checking...
 
         //collision detection
         for (int i = 0; i < gameWorld.getEntities().size(); i++) {
@@ -175,13 +175,13 @@ public class GameDriver {
                 entity2.setY(entity2.getY() - shortest/2);
             }
         } else if (entity1 instanceof Tank && entity2 instanceof Shell) {
-            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
+//            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
         } else if (entity1 instanceof Shell && entity2 instanceof Tank) {
-            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
+//            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
         } else if (entity1 instanceof Shell && entity2 instanceof Shell) {
-            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
+//            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
         } else if (entity1 instanceof Wall && entity2 instanceof Tank) {
-            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
+//            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
             if (entity1.getXBound() - entity2.getX() == shortest) {
                 entity2.setX(entity2.getX() + shortest);
             } else if (entity2.getXBound() - entity1.getX() == shortest) {
@@ -193,7 +193,7 @@ public class GameDriver {
             }
 
         } else if (entity1 instanceof Shell && entity2 instanceof Wall) {
-            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
+//            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
         }
     }
 

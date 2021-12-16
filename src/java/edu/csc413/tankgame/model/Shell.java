@@ -40,6 +40,7 @@ public class Shell extends Entity {
         //TODO refactor
         if (getX() < Constants.SHELL_X_LOWER_BOUND) {
             gameWorld.removeEntity(getId());
+//            destroy here
         } else if (getX() > Constants.SHELL_X_UPPER_BOUND) {
             gameWorld.removeEntity(getId());
         } else if (getY() < Constants.SHELL_Y_LOWER_BOUND) {
