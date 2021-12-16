@@ -7,20 +7,18 @@ import java.util.*;
  * shells, and provides access to this information for any code that needs it (such as GameDriver or entity classes).
  */
 public class GameWorld {
-    // TODO: Implement. There's a lot of information the GameState will need to store to provide contextual information.
-    //       Add whatever instance variables, constructors, and methods are needed.
     private ArrayList<Entity> entities;
     private ArrayList<Entity> entitiesToAdd;
+    private ArrayList<Entity> entitiesToRemove;
 
     public GameWorld() {
-        // TODO: Implement.
         entities = new ArrayList<>();
         entitiesToAdd = new ArrayList<>();
+        entitiesToRemove = new ArrayList<>();
     }
 
     /** Returns a list of all entities in the game. */
     public List<Entity> getEntities() {
-        // TODO: Implement.
         return entities;
     }
 
@@ -30,7 +28,6 @@ public class GameWorld {
 
     /** Adds a new entity to the game. */
     public void addEntity(Entity entity) {
-        // TODO: Implement.
         entitiesToAdd.add(entity);
     }
 
@@ -41,12 +38,36 @@ public class GameWorld {
 
     /** Returns the Entity with the specified ID. */
     public Entity getEntity(String id) {
-        // TODO: Implement.
+        for (Entity entity : entities) {
+            if (entity.getId().equals(id)) return entity;
+        }
         return null;
     }
 
     /** Removes the entity with the specified ID from the game. */
     public void removeEntity(String id) {
         // TODO: Implement.
+        for (Entity entity : entities) {
+            if (entity.getId().equals(id)) {
+//                entitiesToRemove.add(entity);
+                System.out.println("Removing " + entity.getId());
+            }
+        }
+//        for (Entity entity : entities) {
+//            entities.remove(entity);
+//        }
+//        entitiesToRemove.clear();
+    }
+
+    public void moveEntityToRemove(String id) {
+//        for (Entity entity : entities) {
+//            if (entity.getId().equals(id)) {
+//                entitiesToRemove.add(entity);
+//            }
+//        }
+    }
+
+    public List<Entity> getEntitiesToRemove() {
+        return entitiesToRemove;
     }
 }

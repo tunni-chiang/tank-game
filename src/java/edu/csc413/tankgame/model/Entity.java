@@ -25,11 +25,17 @@ public abstract class Entity {
         return x;
     }
 
+//    public double getXBound() {}
+//    xBound = x + width
+
     public void setX(double x) { this.x = x; }
 
     public double getY() {
         return y;
     }
+
+//    public double getYBound() {}
+//    yBound = y + height
 
     public void setY(double y) { this.y = y; }
 
@@ -37,26 +43,31 @@ public abstract class Entity {
         return angle;
     }
 
-    protected void moveForward(double movementSpeed) {
+    public void moveForward(double movementSpeed) {
         x += movementSpeed * Math.cos(angle);
         y += movementSpeed * Math.sin(angle);
     }
 
-    protected void moveBackward(double movementSpeed) {
+    public void moveBackward(double movementSpeed) {
         x -= movementSpeed * Math.cos(angle);
         y -= movementSpeed * Math.sin(angle);
     }
 
-    protected void turnLeft(double turnSpeed) {
+    public void turnLeft(double turnSpeed) {
         angle -= turnSpeed;
     }
 
-    protected void turnRight(double turnSpeed) {
+    public void turnRight(double turnSpeed) {
         angle += turnSpeed;
     }
+
+    public abstract double getXBound();
+
+    public abstract double getYBound();
 
     /** All entities can move, even if the details of their move logic may vary based on the specific type of Entity. */
     public abstract void move(GameWorld gameWorld);
 
     public abstract void checkBounds(GameWorld gameWorld);
+
 }

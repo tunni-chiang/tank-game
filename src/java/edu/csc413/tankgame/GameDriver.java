@@ -4,7 +4,10 @@ import edu.csc413.tankgame.model.*;
 import edu.csc413.tankgame.view.*;
 
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class GameDriver {
     private final MainView mainView;
@@ -59,7 +62,7 @@ public class GameDriver {
                 Constants.PLAYER_TANK_INITIAL_Y,
                 Constants.PLAYER_TANK_INITIAL_ANGLE);
 
-        Tank aiTank = new AiTank(
+        Tank aiTank = new AwareAiTank(
                 Constants.AI_TANK_1_ID,
                 Constants.AI_TANK_1_INITIAL_X,
                 Constants.AI_TANK_1_INITIAL_Y,
@@ -68,8 +71,9 @@ public class GameDriver {
         List<WallInformation> wallInfos = WallInformation.readWalls();
         int id = 0;
         for (WallInformation wallInfo : wallInfos) {
-            //Create a Wall Entity, add it to game world
-            runGameView.addSprite("wall-" + id++, wallInfo.getImageFile(), wallInfo.getX(), wallInfo.getY(), 0.0);
+            Wall wall = new Wall("wall-" + id++, wallInfo.getX(), wallInfo.getY());
+            gameWorld.addEntity(wall);
+            runGameView.addSprite(wall.getId(), wallInfo.getImageFile(), wall.getX(), wall.getY(), wall.getAngle());
         }
 
         gameWorld.addEntity(playerTank);
@@ -103,6 +107,10 @@ public class GameDriver {
             entity.checkBounds(gameWorld);
         }
 
+        for (Entity entity : gameWorld.getEntitiesToRemove()) {
+            runGameView.removeSprite(entity.getId());
+        }
+
         for (Entity entity : gameWorld.getEntitiesToAdd()) {
             runGameView.addSprite(entity.getId(), RunGameView.SHELL_IMAGE_FILE, entity.getX(), entity.getY(), entity.getAngle());
         }
@@ -111,11 +119,82 @@ public class GameDriver {
 
         // doing some other stuff such as collision detection, bounds checking...
 
+        //collision detection
+        for (int i = 0; i < gameWorld.getEntities().size(); i++) {
+            for (int j = i + 1; j < gameWorld.getEntities().size(); j++) {
+                if (areEntitiesColliding(gameWorld.getEntities().get(i), gameWorld.getEntities().get(j))) {
+                    handleCollision(gameWorld.getEntities().get(i), gameWorld.getEntities().get(j));
+                }
+            }
+        }
+
+
         //draw or update entities with new location
         for (Entity entity : gameWorld.getEntities()) {
             runGameView.setSpriteLocationAndAngle(entity.getId(), entity.getX(), entity.getY(), entity.getAngle());
         }
         return true;
+    }
+
+    private boolean areEntitiesColliding(Entity entity1, Entity entity2) {
+        return !((entity2.getX() > entity1.getXBound()) || (entity1.getX() > entity2.getXBound()) ||
+                (entity2.getY() > entity1.getYBound()) || (entity1.getY() > entity2.getYBound()));
+    }
+
+    private void handleCollision(Entity entity1, Entity entity2) {
+        //if entityA instanceof Tank && entityB instanceof Tank
+        //tank: push each other away until they are no longer touching -> how far? which direction?
+        //calculate the distance of four direction and figure out which one is the shortest
+        //move at the shortest distance direction
+        //else if tank - shell
+        //shell: should be removed
+        //else if tank - wall
+        //tank:
+        //else if shell - wall
+        //shell: should be removed
+        ArrayList<Double> distances = new ArrayList<>();
+        distances.add(entity2.getXBound() - entity1.getX());
+        distances.add(entity1.getXBound() - entity2.getX());
+        distances.add(entity1.getYBound() - entity2.getY());
+        distances.add(entity2.getYBound() - entity1.getY());
+        double shortest = Collections.min(distances);
+        if (entity1 instanceof Tank && entity2 instanceof Tank) {
+            //TODO refactor
+            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
+            if (entity1.getXBound() - entity2.getX() == shortest) {
+                entity1.setX(entity1.getX() - shortest/2);
+                entity2.setX(entity2.getX() + shortest/2);
+            } else if (entity2.getXBound() - entity1.getX() == shortest) {
+                entity1.setX(entity1.getX() + shortest/2);
+                entity2.setX(entity2.getX() - shortest/2);
+            } else if (entity1.getYBound() - entity2.getY() == shortest) {
+                entity1.setY(entity1.getY() - shortest/2);
+                entity2.setY(entity2.getY() + shortest/2);
+            } else {
+                entity1.setY(entity1.getY() + shortest/2);
+                entity2.setY(entity2.getY() - shortest/2);
+            }
+        } else if (entity1 instanceof Tank && entity2 instanceof Shell) {
+            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
+        } else if (entity1 instanceof Shell && entity2 instanceof Tank) {
+            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
+        } else if (entity1 instanceof Shell && entity2 instanceof Shell) {
+            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
+        } else if (entity1 instanceof Wall && entity2 instanceof Tank) {
+            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
+            if (entity1.getXBound() - entity2.getX() == shortest) {
+                entity2.setX(entity2.getX() + shortest);
+            } else if (entity2.getXBound() - entity1.getX() == shortest) {
+                entity2.setX(entity2.getX() - shortest);
+            } else if (entity1.getYBound() - entity2.getY() == shortest) {
+                entity2.setY(entity2.getY() + shortest);
+            } else {
+                entity2.setY(entity2.getY() - shortest);
+            }
+
+        } else if (entity1 instanceof Shell && entity2 instanceof Wall) {
+            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
+        }
     }
 
     /**

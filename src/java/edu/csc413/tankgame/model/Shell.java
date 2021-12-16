@@ -19,6 +19,16 @@ public class Shell extends Entity {
     }
 
     @Override
+    public double getXBound() {
+        return getX() + Constants.SHELL_WIDTH;
+    }
+
+    @Override
+    public double getYBound() {
+        return getY() + Constants.SHELL_HEIGHT;
+    }
+
+    @Override
     public void move(GameWorld gameWorld) {
         moveForward(Constants.SHELL_MOVEMENT_SPEED);
     }
@@ -27,5 +37,15 @@ public class Shell extends Entity {
     public void checkBounds(GameWorld gameWorld) {
         //check if shell is out of bounds
         //if it is, remove it from gameWorld
+        //TODO refactor
+        if (getX() < Constants.SHELL_X_LOWER_BOUND) {
+            gameWorld.removeEntity(getId());
+        } else if (getX() > Constants.SHELL_X_UPPER_BOUND) {
+            gameWorld.removeEntity(getId());
+        } else if (getY() < Constants.SHELL_Y_LOWER_BOUND) {
+            gameWorld.removeEntity(getId());
+        } else if (getY() > Constants.SHELL_Y_UPPER_BOUND) {
+            gameWorld.removeEntity(getId());
+        }
     }
 }
