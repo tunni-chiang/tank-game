@@ -100,20 +100,20 @@ public class GameDriver {
      * (e.g. the player tank being destroyed, escape being pressed), it should return false.
      */
     private boolean updateGame() {
+
         //move the entities then check bounds
-        List<Entity> currentEntities = gameWorld.getEntities();
-        for (int i = 0; i < currentEntities.size(); i++) {
-            currentEntities.get(i).move(gameWorld);
-            currentEntities.get(i).checkBounds(gameWorld);
+        for (Entity entity : gameWorld.getEntities()) {
+            entity.move(gameWorld);
+            entity.checkBounds(gameWorld);
         }
 
-        //remove the sprite on the screen
+        //remove the picture of the ready to be removed entities
         for (Entity entity : gameWorld.getEntitiesToRemove()) {
             runGameView.removeSprite(entity.getId());
         }
-        gameWorld.getEntitiesToRemove().clear();
+        gameWorld.removeEntityFromEntities();
 
-        //add sprite to the screen
+        //draw picture on screen
         for (Entity entity : gameWorld.getEntitiesToAdd()) {
             runGameView.addSprite(entity.getId(), RunGameView.SHELL_IMAGE_FILE, entity.getX(), entity.getY(), entity.getAngle());
         }
@@ -128,11 +128,11 @@ public class GameDriver {
             }
         }
 
-
         //draw or update entities with new location
         for (Entity entity : gameWorld.getEntities()) {
             runGameView.setSpriteLocationAndAngle(entity.getId(), entity.getX(), entity.getY(), entity.getAngle());
         }
+
         return true;
     }
 

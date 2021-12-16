@@ -47,32 +47,19 @@ public class GameWorld {
     /** Removes the entity with the specified ID from the game. */
     public void removeEntity(String id) {
         // TODO: Implement.
-
-        for (int i = 0; i< entities.size(); i++) {
-            if (entities.get(i).getId().equals(id)) {
-                entitiesToRemove.add(entities.get(i));
-                entities.remove(entities.get(i));
-                System.out.println("Removing " + entities.get(i).getId());
-                System.out.println("Array after removed:");
-                for (int j = 0; j < entities.size(); j++) {
-                    System.out.print(entities.get(j).getId() + " ");
-                }
-                System.out.println();
-                System.out.println("Array to remove:");
-                for (int j = 0; j < entitiesToRemove.size(); j++) {
-                    System.out.print(entitiesToRemove.get(j).getId() + " ");
-                }
-                System.out.println();
+        for (Entity entity : entities) {
+            if (entity.getId().equals(id)) {
+                entitiesToRemove.add(entity);
+                System.out.println("Removing " + entity.getId());
             }
         }
     }
 
-    public void moveEntityToRemove(String id) {
-//        for (Entity entity : entities) {
-//            if (entity.getId().equals(id)) {
-//                entitiesToRemove.add(entity);
-//            }
-//        }
+    public void removeEntityFromEntities() {
+        for (Entity entity : entitiesToRemove) {
+            entities.remove(entity);
+        }
+        entitiesToRemove.clear();
     }
 
     public List<Entity> getEntitiesToRemove() {
