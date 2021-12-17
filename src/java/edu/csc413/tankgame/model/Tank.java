@@ -5,10 +5,13 @@ import edu.csc413.tankgame.Constants;
 public abstract class Tank extends Entity {
     private static final int INITIAL_SHELL_COOLDOWN = 80;
     private int shellCoolDown;
+    private static final int INITIAL_TANK_LIVES = 10;
+    private int lives;
 
     public Tank(String id, double x, double y, double angle) {
         super(id, x, y, angle);
         shellCoolDown = INITIAL_SHELL_COOLDOWN;
+        lives = INITIAL_TANK_LIVES;
     }
 
     protected int getShellCoolDown() {

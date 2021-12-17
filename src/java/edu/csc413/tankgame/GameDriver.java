@@ -4,6 +4,7 @@ import edu.csc413.tankgame.model.*;
 import edu.csc413.tankgame.view.*;
 
 import java.awt.event.ActionEvent;
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +37,7 @@ public class GameDriver {
         mainView.setScreen(MainView.Screen.RUN_GAME_SCREEN);
         Runnable gameRunner = () -> {
             setUpGame();
-            while (updateGame()) {
+            while (updateGame() && !KeyboardReader.instance().escapePressed()) {
                 runGameView.repaint();
                 try {
                     Thread.sleep(10L);
@@ -55,7 +56,6 @@ public class GameDriver {
      * should be initialized here, with their corresponding sprites added to the RunGameView.
      */
     private void setUpGame() {
-        // TODO: Implement.
         Tank playerTank = new PlayerTank(
                 Constants.PLAYER_TANK_ID,
                 Constants.PLAYER_TANK_INITIAL_X,
@@ -208,7 +208,11 @@ public class GameDriver {
      */
     private void resetGame() {
         // TODO: Implement.
+        for (Entity entity : gameWorld.getEntities()) {
+            gameWorld.removeEntity(entity.getId());
+        }
         runGameView.reset();
+        gameWorld.removeEntityFromEntities();
     }
 
     public static void main(String[] args) {
