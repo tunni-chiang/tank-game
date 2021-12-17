@@ -9,12 +9,15 @@ public abstract class Entity {
     private double x;
     private double y;
     private double angle;
+    private static final int INITIAL_TANK_LIVES = 10;
+    private int lives;
 
     public Entity(String id, double x, double y, double angle) {
         this.id = id;
         this.x = x;
         this.y = y;
         this.angle = angle;
+        lives = INITIAL_TANK_LIVES;
     }
 
     public String getId() {
@@ -59,6 +62,14 @@ public abstract class Entity {
 
     public void turnRight(double turnSpeed) {
         angle += turnSpeed;
+    }
+
+    public void reduceLives() {
+        lives--;
+    }
+
+    public boolean checkAlive() {
+        return lives > 0;
     }
 
     public abstract double getXBound();

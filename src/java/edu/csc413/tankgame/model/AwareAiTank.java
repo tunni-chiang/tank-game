@@ -2,7 +2,7 @@ package edu.csc413.tankgame.model;
 
 import edu.csc413.tankgame.Constants;
 
-public class AwareAiTank extends Tank {
+public class AwareAiTank extends AiTank {
 
     public AwareAiTank(String id, double x, double y, double angle) {
         super(id, x, y, angle);

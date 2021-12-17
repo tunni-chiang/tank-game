@@ -50,7 +50,6 @@ public class GameWorld {
         for (Entity entity : entities) {
             if (entity.getId().equals(id)) {
                 entitiesToRemove.add(entity);
-                System.out.println("Removing " + entity.getId());
             }
         }
     }

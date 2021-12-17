@@ -4,11 +4,9 @@ import edu.csc413.tankgame.model.*;
 import edu.csc413.tankgame.view.*;
 
 import java.awt.event.ActionEvent;
-import java.security.Key;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class GameDriver {
     private final MainView mainView;
@@ -62,11 +60,17 @@ public class GameDriver {
                 Constants.PLAYER_TANK_INITIAL_Y,
                 Constants.PLAYER_TANK_INITIAL_ANGLE);
 
-        Tank aiTank = new AwareAiTank(
+        Tank aiTank = new AiTank(
                 Constants.AI_TANK_1_ID,
                 Constants.AI_TANK_1_INITIAL_X,
                 Constants.AI_TANK_1_INITIAL_Y,
                 Constants.AI_TANK_1_INITIAL_ANGLE);
+
+        Tank aiTank2 = new AiTank(
+                Constants.AI_TANK_2_ID,
+                Constants.AI_TANK_2_INITIAL_X,
+                Constants.AI_TANK_2_INITIAL_Y,
+                Constants.AI_TANK_2_INITIAL_ANGLE);
 
         List<WallInformation> wallInfos = WallInformation.readWalls();
         int id = 0;
@@ -78,6 +82,7 @@ public class GameDriver {
 
         gameWorld.addEntity(playerTank);
         gameWorld.addEntity(aiTank);
+        gameWorld.addEntity(aiTank2);
         gameWorld.moveEntitiesToAdd();
 
         runGameView.addSprite(
@@ -92,6 +97,13 @@ public class GameDriver {
                 aiTank.getX(),
                 aiTank.getY(),
                 aiTank.getAngle());
+        runGameView.addSprite(
+                aiTank2.getId(),
+                RunGameView.AI_TANK_IMAGE_FILE,
+                aiTank2.getX(),
+                aiTank2.getY(),
+                aiTank2.getAngle());
+
     }
 
     /**
@@ -105,6 +117,23 @@ public class GameDriver {
         for (Entity entity : gameWorld.getEntities()) {
             entity.move(gameWorld);
             entity.checkBounds(gameWorld);
+        }
+
+        //check if entities are still alive
+        for (Entity entity : gameWorld.getEntities()) {
+            if (!entity.checkAlive()) {
+                gameWorld.removeEntity(entity.getId());
+                runGameView.addAnimation(
+                        RunGameView.BIG_EXPLOSION_ANIMATION,
+                        RunGameView.BIG_EXPLOSION_FRAME_DELAY,
+                        entity.getX(),
+                        entity.getY());
+                if (entity instanceof PlayerTank) return false;
+                else if (entity instanceof AiTank) {
+                    ((AiTank) entity).reduceNumOfAiTank();
+                    if (!((AiTank) entity).stillHaveAiTank()) return false;
+                }
+            }
         }
 
         //collision detection and handling
@@ -124,9 +153,9 @@ public class GameDriver {
 
         //remove the picture of the ready to be removed entities
         for (Entity entity : gameWorld.getEntitiesToRemove()) {
-            System.out.println("removing sprite of " + entity.getId());
             runGameView.removeSprite(entity.getId());
         }
+
         gameWorld.removeEntityFromEntities();
 
         //draw or update entities with new location
@@ -143,16 +172,6 @@ public class GameDriver {
     }
 
     private void handleCollision(Entity entity1, Entity entity2) {
-        //if entityA instanceof Tank && entityB instanceof Tank
-        //tank: push each other away until they are no longer touching -> how far? which direction?
-        //calculate the distance of four direction and figure out which one is the shortest
-        //move at the shortest distance direction
-        //else if tank - shell
-        //shell: should be removed
-        //else if tank - wall
-        //tank:
-        //else if shell - wall
-        //shell: should be removed
         ArrayList<Double> distances = new ArrayList<>();
         distances.add(entity2.getXBound() - entity1.getX());
         distances.add(entity1.getXBound() - entity2.getX());
@@ -160,8 +179,6 @@ public class GameDriver {
         distances.add(entity2.getYBound() - entity1.getY());
         double shortest = Collections.min(distances);
         if (entity1 instanceof Tank && entity2 instanceof Tank) {
-            //TODO refactor
-            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
             if (entity1.getXBound() - entity2.getX() == shortest) {
                 entity1.setX(entity1.getX() - shortest/2);
                 entity2.setX(entity2.getX() + shortest/2);
@@ -176,14 +193,33 @@ public class GameDriver {
                 entity2.setY(entity2.getY() - shortest/2);
             }
         } else if (entity1 instanceof Tank && entity2 instanceof Shell) {
-            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
             gameWorld.removeEntity(entity2.getId());
+            runGameView.addAnimation(
+                    RunGameView.SHELL_EXPLOSION_ANIMATION,
+                    RunGameView.SHELL_EXPLOSION_FRAME_DELAY,
+                    entity2.getX(),
+                    entity2.getY());
+            ((Tank) entity1).reduceLives();
         } else if (entity1 instanceof Shell && entity2 instanceof Tank) {
-            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
             gameWorld.removeEntity(entity1.getId());
+            runGameView.addAnimation(
+                    RunGameView.SHELL_EXPLOSION_ANIMATION,
+                    RunGameView.SHELL_EXPLOSION_FRAME_DELAY,
+                    entity1.getX(),
+                    entity1.getY());
+            ((Tank) entity2).reduceLives();
         } else if (entity1 instanceof Shell && entity2 instanceof Shell) {
-            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
             gameWorld.removeEntity(entity2.getId());
+            runGameView.addAnimation(
+                    RunGameView.SHELL_EXPLOSION_ANIMATION,
+                    RunGameView.SHELL_EXPLOSION_FRAME_DELAY,
+                    entity1.getX(),
+                    entity1.getY());
+            runGameView.addAnimation(
+                    RunGameView.SHELL_EXPLOSION_ANIMATION,
+                    RunGameView.SHELL_EXPLOSION_FRAME_DELAY,
+                    entity2.getX(),
+                    entity2.getY());
         } else if (entity1 instanceof Wall && entity2 instanceof Tank) {
             if (entity1.getXBound() - entity2.getX() == shortest) {
                 entity2.setX(entity2.getX() + shortest);
@@ -195,11 +231,22 @@ public class GameDriver {
                 entity2.setY(entity2.getY() - shortest);
             }
         } else if (entity1 instanceof Shell && entity2 instanceof Wall) {
-            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
             gameWorld.removeEntity(entity1.getId());
+            runGameView.addAnimation(
+                    RunGameView.SHELL_EXPLOSION_ANIMATION,
+                    RunGameView.SHELL_EXPLOSION_FRAME_DELAY,
+                    entity1.getX(),
+                    entity1.getY());
+            entity2.reduceLives();
         } else if (entity1 instanceof Wall && entity2 instanceof Shell) {
-            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
-            gameWorld.removeEntity(entity2.getId());        }
+            gameWorld.removeEntity(entity2.getId());
+            runGameView.addAnimation(
+                    RunGameView.SHELL_EXPLOSION_ANIMATION,
+                    RunGameView.SHELL_EXPLOSION_FRAME_DELAY,
+                    entity2.getX(),
+                    entity2.getY());
+            entity1.reduceLives();
+        }
     }
 
     /**
