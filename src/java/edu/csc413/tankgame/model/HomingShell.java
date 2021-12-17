@@ -2,25 +2,30 @@ package edu.csc413.tankgame.model;
 
 import edu.csc413.tankgame.Constants;
 
-public class AwareAiTank extends AiTank {
+public class HomingShell extends Shell {
 
-    public AwareAiTank(String id, double x, double y, double angle) {
-        super(id, x, y, angle);
+    public HomingShell(double x, double y, double angle) {
+        super(x, y, angle);
     }
 
     @Override
     public void move(GameWorld gameWorld) {
-        Entity playerTank = gameWorld.getEntity(Constants.PLAYER_TANK_ID);
+        Entity aiTank;
+        if (gameWorld.getEntity(Constants.AI_TANK_1_ID) != null) {
+            aiTank = gameWorld.getEntity(Constants.AI_TANK_1_ID);
+        } else {
+            aiTank = gameWorld.getEntity(Constants.AI_TANK_2_ID);
+        }
 
-        // To figure out what angle the AI tank needs to face, we'll use the
-        // change in the x and y axes between the AI and player tanks.
+        // To figure out what angle the homing shell  needs to face, we'll use the
+        // change in the x and y axes between the shell and ai tanks.
 
-        double dx = playerTank.getX() - getX();
-        double dy = playerTank.getY() - getY();
+        double dx = aiTank.getX() - getX();
+        double dy = aiTank.getY() - getY();
 
         // atan2 applies arctangent to the ratio of the two provided values.
-        double angleToPlayer = Math.atan2(dy, dx);
-        double angleDifference = getAngle() - angleToPlayer;
+        double angleToAi = Math.atan2(dy, dx);
+        double angleDifference = getAngle() - angleToAi;
 
         // We want to keep the angle difference between -180 degrees and 180
         // degrees for the next step. This ensures that anything outside of that
@@ -37,12 +42,10 @@ public class AwareAiTank extends AiTank {
         // and right turns, so we build in a small margin of error.
 
         if (angleDifference < -Math.toRadians(3.0)) {
-            turnRight(Constants.TANK_TURN_SPEED);
+            turnRight(Constants.SHELL_TURN_SPEED);
         } else if (angleDifference > Math.toRadians(3.0)) {
-            turnLeft(Constants.TANK_TURN_SPEED);
+            turnLeft(Constants.SHELL_TURN_SPEED);
         }
-
-        if (getShellCoolDown() > 0) reduceShellCoolDown();
-        fireShell(gameWorld);
+        moveForward(Constants.SHELL_MOVEMENT_SPEED);
     }
 }

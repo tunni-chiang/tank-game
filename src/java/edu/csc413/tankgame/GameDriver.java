@@ -12,11 +12,14 @@ public class GameDriver {
     private final MainView mainView;
     private final RunGameView runGameView;
     private final GameWorld gameWorld;
+    private final int POWER_UP_INITIAL_VALUE = 1000;
+    private int power_up_count_down;
 
     public GameDriver() {
         mainView = new MainView(this::startMenuActionPerformed);
         runGameView = mainView.getRunGameView();
         gameWorld = new GameWorld();
+        power_up_count_down = POWER_UP_INITIAL_VALUE;
     }
 
     public void start() {
@@ -119,6 +122,23 @@ public class GameDriver {
             entity.checkBounds(gameWorld);
         }
 
+        //add power up when count down reach 0
+        if (power_up_count_down == 0) {
+            PowerUp powerup = new PowerUp(
+                    generateRandomX(),
+                    generateRandomY(),
+                    Constants.POWER_UP_INITIAL_ANGLE);
+            gameWorld.addEntity(powerup);
+            gameWorld.moveEntitiesToAdd();
+            runGameView.addSprite(
+                    powerup.getId(),
+                    RunGameView.POWER_UP_IMAGE_FILE,
+                    powerup.getX(),
+                    powerup.getY(),
+                    powerup.getAngle());
+            power_up_count_down = POWER_UP_INITIAL_VALUE;
+        }
+
         //check if entities are still alive
         for (Entity entity : gameWorld.getEntities()) {
             if (!entity.checkAlive()) {
@@ -162,6 +182,9 @@ public class GameDriver {
         for (Entity entity : gameWorld.getEntities()) {
             runGameView.setSpriteLocationAndAngle(entity.getId(), entity.getX(), entity.getY(), entity.getAngle());
         }
+
+        //increase decrease power up count down
+        power_up_count_down--;
 
         return true;
     }
@@ -246,7 +269,23 @@ public class GameDriver {
                     entity2.getX(),
                     entity2.getY());
             entity1.reduceLives();
+        } else if (entity1 instanceof PlayerTank && entity2 instanceof PowerUp) {
+            gameWorld.removeEntity(entity2.getId());
+            ((PlayerTank) entity1).addPowerUp();
+        } else if (entity1 instanceof PowerUp && entity2 instanceof PlayerTank) {
+            gameWorld.removeEntity(entity1.getId());
+            ((PlayerTank) entity2).addPowerUp();
         }
+    }
+
+    private double generateRandomX() {
+        System.out.println("getting " + ((Math.random() * RunGameView.SCREEN_WIDTH) + 1) + "from random");
+        return (Math.random() * RunGameView.SCREEN_WIDTH) + 1;
+    }
+
+    private double generateRandomY() {
+        System.out.println("getting " + ((Math.random() * RunGameView.SCREEN_HEIGHT) + 1) + "from random");
+        return (Math.random() * RunGameView.SCREEN_HEIGHT) + 1;
     }
 
     /**

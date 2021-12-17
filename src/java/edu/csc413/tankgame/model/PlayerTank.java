@@ -5,8 +5,19 @@ import edu.csc413.tankgame.KeyboardReader;
 
 public class PlayerTank extends Tank {
 
+    private boolean powerUp;
+    private int POWER_UP_EXPIRED_INIT_VALUE = 1000;
+    private int powerUpExpiredTime;
+
     public PlayerTank(String id, double x, double y, double angle) {
         super(id, x, y, angle);
+        powerUp = false;
+    }
+
+    public void addPowerUp() {
+        powerUpExpiredTime = POWER_UP_EXPIRED_INIT_VALUE;
+        System.out.println("adding power up");
+        powerUp = true;
     }
 
     @Override
@@ -18,6 +29,24 @@ public class PlayerTank extends Tank {
         if (KeyboardReader.instance().spacePressed()) {
             reduceShellCoolDown();
             fireShell(gameWorld);
+        }
+        if (powerUp) powerUpExpiredTime--;
+        System.out.println("power up time: " + powerUpExpiredTime);
+        if (powerUpExpiredTime == 0 && powerUp) powerUp = false;
+    }
+
+    @Override
+    protected void fireShell(GameWorld gameWorld) {
+        System.out.println("Power Up " + powerUp);
+        if (getShellCoolDown() == 0) {
+            Shell newShell;
+            if (powerUp) {
+                newShell = new HomingShell(getShellX(), getShellY(), getAngle());
+            } else {
+                newShell = new Shell(getShellX(), getShellY(), getAngle());
+            }
+            gameWorld.addEntity(newShell);
+            resetShellCoolDown();
         }
     }
 }
