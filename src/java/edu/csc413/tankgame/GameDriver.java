@@ -107,19 +107,7 @@ public class GameDriver {
             entity.checkBounds(gameWorld);
         }
 
-        //remove the picture of the ready to be removed entities
-        for (Entity entity : gameWorld.getEntitiesToRemove()) {
-            runGameView.removeSprite(entity.getId());
-        }
-        gameWorld.removeEntityFromEntities();
-
-        //draw picture on screen
-        for (Entity entity : gameWorld.getEntitiesToAdd()) {
-            runGameView.addSprite(entity.getId(), RunGameView.SHELL_IMAGE_FILE, entity.getX(), entity.getY(), entity.getAngle());
-        }
-        gameWorld.moveEntitiesToAdd();
-
-        //collision detection
+        //collision detection and handling
         for (int i = 0; i < gameWorld.getEntities().size(); i++) {
             for (int j = i + 1; j < gameWorld.getEntities().size(); j++) {
                 if (areEntitiesColliding(gameWorld.getEntities().get(i), gameWorld.getEntities().get(j))) {
@@ -127,6 +115,19 @@ public class GameDriver {
                 }
             }
         }
+
+        //draw picture on screen
+        for (Entity entity : gameWorld.getEntitiesToAdd()) {
+            runGameView.addSprite(entity.getId(), RunGameView.SHELL_IMAGE_FILE, entity.getX(), entity.getY(), entity.getAngle());
+        }
+        gameWorld.moveEntitiesToAdd();
+
+        //remove the picture of the ready to be removed entities
+        for (Entity entity : gameWorld.getEntitiesToRemove()) {
+            System.out.println("removing sprite of " + entity.getId());
+            runGameView.removeSprite(entity.getId());
+        }
+        gameWorld.removeEntityFromEntities();
 
         //draw or update entities with new location
         for (Entity entity : gameWorld.getEntities()) {
@@ -175,13 +176,15 @@ public class GameDriver {
                 entity2.setY(entity2.getY() - shortest/2);
             }
         } else if (entity1 instanceof Tank && entity2 instanceof Shell) {
-//            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
+            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
+            gameWorld.removeEntity(entity2.getId());
         } else if (entity1 instanceof Shell && entity2 instanceof Tank) {
-//            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
+            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
+            gameWorld.removeEntity(entity1.getId());
         } else if (entity1 instanceof Shell && entity2 instanceof Shell) {
-//            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
+            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
+            gameWorld.removeEntity(entity2.getId());
         } else if (entity1 instanceof Wall && entity2 instanceof Tank) {
-//            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
             if (entity1.getXBound() - entity2.getX() == shortest) {
                 entity2.setX(entity2.getX() + shortest);
             } else if (entity2.getXBound() - entity1.getX() == shortest) {
@@ -191,10 +194,12 @@ public class GameDriver {
             } else {
                 entity2.setY(entity2.getY() - shortest);
             }
-
         } else if (entity1 instanceof Shell && entity2 instanceof Wall) {
-//            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
-        }
+            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
+            gameWorld.removeEntity(entity1.getId());
+        } else if (entity1 instanceof Wall && entity2 instanceof Shell) {
+            System.out.println("Handling " + entity1.getId() + " & " + entity2.getId());
+            gameWorld.removeEntity(entity2.getId());        }
     }
 
     /**
