@@ -16,7 +16,9 @@ public class HomingShell extends Shell {
         } else {
             aiTank = gameWorld.getEntity(Constants.AI_TANK_2_ID);
         }
-
+        if(aiTank == null){
+            return;
+        }
         // To figure out what angle the homing shell  needs to face, we'll use the
         // change in the x and y axes between the shell and ai tanks.
 

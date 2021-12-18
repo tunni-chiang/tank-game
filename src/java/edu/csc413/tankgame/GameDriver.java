@@ -69,7 +69,7 @@ public class GameDriver {
                 Constants.AI_TANK_1_INITIAL_Y,
                 Constants.AI_TANK_1_INITIAL_ANGLE);
 
-        Tank aiTank2 = new AiTank(
+        Tank aiTank2 = new AwareAiTank(
                 Constants.AI_TANK_2_ID,
                 Constants.AI_TANK_2_INITIAL_X,
                 Constants.AI_TANK_2_INITIAL_Y,
@@ -107,6 +107,34 @@ public class GameDriver {
                 aiTank2.getY(),
                 aiTank2.getAngle());
 
+        //adding image for hearts
+        int numOfAiTank = -1;
+        for (Entity entity : gameWorld.getEntities()) {
+
+            if (!(entity instanceof Tank)) continue;
+            if (entity instanceof AiTank) numOfAiTank++;
+            Tank tank = (Tank) entity;
+            for (int i = 0; i < Constants.LIVES_INITIAL; i++) {
+                Heart heart;
+                if (tank instanceof PlayerTank) {
+                    heart = new Heart(
+                            Constants.PLAYER_HEART_INITIAL_X + i * Constants.HEART_WIDTH, Constants.PLAYER_HEART_INITIAL_Y);
+                } else {
+                    heart = new Heart(
+                            Constants.AI_HEART_INITIAL_X + i * Constants.HEART_WIDTH,
+                            Constants.AI_HEART_INITIAL_Y + numOfAiTank * Constants.HEART_HEIGHT);
+                }
+                tank.setHeartId(heart.getId());
+                gameWorld.addEntity(heart);
+                runGameView.addSprite(
+                        heart.getId(),
+                        RunGameView.HEART_IMAGE_FILE,
+                        heart.getX(),
+                        heart.getY(),
+                        heart.getAngle());
+            }
+        }
+        gameWorld.moveEntitiesToAdd();
     }
 
     /**
@@ -223,6 +251,7 @@ public class GameDriver {
                     entity2.getX(),
                     entity2.getY());
             ((Tank) entity1).reduceLives();
+            gameWorld.removeEntity(((Tank) entity1).getHeartId());
         } else if (entity1 instanceof Shell && entity2 instanceof Tank) {
             gameWorld.removeEntity(entity1.getId());
             runGameView.addAnimation(
@@ -231,6 +260,7 @@ public class GameDriver {
                     entity1.getX(),
                     entity1.getY());
             ((Tank) entity2).reduceLives();
+            gameWorld.removeEntity(((Tank) entity1).getHeartId());
         } else if (entity1 instanceof Shell && entity2 instanceof Shell) {
             gameWorld.removeEntity(entity2.getId());
             runGameView.addAnimation(
@@ -293,7 +323,6 @@ public class GameDriver {
      * the game so that if the game is restarted, there aren't any things leftover from the previous run.
      */
     private void resetGame() {
-        // TODO: Implement.
         for (Entity entity : gameWorld.getEntities()) {
             gameWorld.removeEntity(entity.getId());
         }

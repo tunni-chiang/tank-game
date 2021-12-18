@@ -1,5 +1,9 @@
 package edu.csc413.tankgame.model;
 
+import edu.csc413.tankgame.Constants;
+
+import java.lang.constant.Constable;
+
 /**
  * A general concept for an entity in the Tank Game. This includes everything that can move or be interacted with, such
  * as tanks, shells, walls, power ups, etc.
@@ -9,7 +13,6 @@ public abstract class Entity {
     private double x;
     private double y;
     private double angle;
-    private static final int INITIAL_TANK_LIVES = 10;
     private int lives;
 
     public Entity(String id, double x, double y, double angle) {
@@ -17,7 +20,7 @@ public abstract class Entity {
         this.x = x;
         this.y = y;
         this.angle = angle;
-        lives = INITIAL_TANK_LIVES;
+        lives = Constants.LIVES_INITIAL;
     }
 
     public String getId() {

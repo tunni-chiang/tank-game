@@ -2,13 +2,17 @@ package edu.csc413.tankgame.model;
 
 import edu.csc413.tankgame.Constants;
 
+import java.util.ArrayList;
+
 public abstract class Tank extends Entity {
     private static final int INITIAL_SHELL_COOLDOWN = 80;
     private int shellCoolDown;
+    private ArrayList<String> heart_id;
 
     public Tank(String id, double x, double y, double angle) {
         super(id, x, y, angle);
         shellCoolDown = INITIAL_SHELL_COOLDOWN;
+        heart_id = new ArrayList<>();
     }
 
     protected int getShellCoolDown() {
@@ -64,5 +68,15 @@ public abstract class Tank extends Entity {
     @Override
     public double getYBound() {
         return getY() + Constants.TANK_HEIGHT;
+    }
+
+    public void setHeartId(String id) {
+        heart_id.add(id);
+    }
+
+    public String getHeartId() {
+        String id = heart_id.get(0);
+        heart_id.remove(0);
+        return id;
     }
 }

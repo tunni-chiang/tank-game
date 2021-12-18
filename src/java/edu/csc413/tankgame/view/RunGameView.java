@@ -21,6 +21,7 @@ public class RunGameView extends JPanel {
     public static final String AI_TANK_IMAGE_FILE = "ai-tank.png";
     public static final String SHELL_IMAGE_FILE = "shell.png";
     public static final String POWER_UP_IMAGE_FILE = "powerup.png";
+    public static final String HEART_IMAGE_FILE = "heart.png";
 
     static final Dimension SCREEN_DIMENSIONS = new Dimension(1024, 768);
     public static final int SCREEN_WIDTH = 800;

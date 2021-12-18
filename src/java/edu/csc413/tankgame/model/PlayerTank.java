@@ -16,7 +16,6 @@ public class PlayerTank extends Tank {
 
     public void addPowerUp() {
         powerUpExpiredTime = POWER_UP_EXPIRED_INIT_VALUE;
-        System.out.println("adding power up");
         powerUp = true;
     }
 
@@ -31,13 +30,11 @@ public class PlayerTank extends Tank {
             fireShell(gameWorld);
         }
         if (powerUp) powerUpExpiredTime--;
-        System.out.println("power up time: " + powerUpExpiredTime);
         if (powerUpExpiredTime == 0 && powerUp) powerUp = false;
     }
 
     @Override
     protected void fireShell(GameWorld gameWorld) {
-        System.out.println("Power Up " + powerUp);
         if (getShellCoolDown() == 0) {
             Shell newShell;
             if (powerUp) {
